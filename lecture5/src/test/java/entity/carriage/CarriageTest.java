@@ -9,7 +9,7 @@ class CarriageTest {
 
     @Test
     void addNextSameCarriage() {
-        PassengerCarriage car1 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
+        PassengerCarriage car1 = TestCarriage.passengerCarriage();
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             car1.addNext(car1);
@@ -23,7 +23,7 @@ class CarriageTest {
 
     @Test
     void addPreviousSameCarriage() {
-        PassengerCarriage car1 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
+        PassengerCarriage car1 = TestCarriage.passengerCarriage();
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             car1.addNext(car1);
@@ -37,8 +37,8 @@ class CarriageTest {
 
     @Test
     void addPreviousNext() {
-        PassengerCarriage car1 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
-        PassengerCarriage car2 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
+        PassengerCarriage car1 = TestCarriage.passengerCarriage();
+        PassengerCarriage car2 = TestCarriage.passengerCarriage();
 
         car1.addNext(car2);
 
@@ -50,5 +50,31 @@ class CarriageTest {
         String actual = exception.getMessage();
 
         assertThat(actual, containsStringIgnoringCase(expected));
+    }
+
+    @Test
+    void removePrevious() {
+        PassengerCarriage car1 = TestCarriage.passengerCarriage();
+        PassengerCarriage car2 = TestCarriage.passengerCarriage();
+
+        car1.addNext(car2);
+        assertEquals(car1, car2.getPrev());
+        car2.removePrevious();
+
+        assertThat(car2.getPrev(), is(nullValue()));
+        assertThat(car1.getNext(), is(nullValue()));
+    }
+
+    @Test
+    void removeNext() {
+        PassengerCarriage car1 = TestCarriage.passengerCarriage();
+        PassengerCarriage car2 = TestCarriage.passengerCarriage();
+
+        car1.addNext(car2);
+        assertEquals(car1, car2.getPrev());
+        car1.removeNext();
+
+        assertThat(car2.getPrev(), is(nullValue()));
+        assertThat(car1.getNext(), is(nullValue()));
     }
 }

@@ -1,6 +1,7 @@
 package util;
 
 import entity.carriage.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -10,23 +11,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CarriageUtilTest {
 
+    Locomotive loc;
+    PassengerCarriage pas1;
+    PassengerCarriage pas2;
+    PassengerCarriage pas3;
+
+    @BeforeEach
+    void setUp() {
+
+        loc = TestCarriage.locomotive();
+        pas1 = TestCarriage.passengerCarriage();
+        pas2 = TestCarriage.passengerCarriage();
+
+    }
+
     @Test
     void blindedCarriages() {
 
         List<Carriage> expected = new ArrayList<>();
+        expected.add(loc);
+        expected.add(pas1);
+        expected.add(pas2);
 
-        Locomotive car1 = (Locomotive) CarriageFactory.create(CarriageTypes.LOCOMOTIVE);
-        PassengerCarriage car2 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
-        PassengerCarriage car3 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
+        loc.addNext(pas1);
+        pas1.addNext(pas2);
 
-        expected.add(car1);
-        expected.add(car2);
-        expected.add(car3);
-
-        car1.addNext(car2);
-        car2.addNext(car3);
-
-        List<Carriage> actual = CarriageUtil.bindedCarriages(car3);
+        List<Carriage> actual = CarriageUtil.bindedCarriages(pas2);
 
         assertEquals(expected, actual);
 
@@ -34,30 +44,27 @@ class CarriageUtilTest {
 
     @Test
     void getHead() {
-        Locomotive expected = (Locomotive) CarriageFactory.create(CarriageTypes.LOCOMOTIVE);
+        Locomotive expected = loc;
 
-        PassengerCarriage car2 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
-        PassengerCarriage car3 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
-        expected.addNext(car2);
-        car2.addNext(car3);
+        expected.addNext(pas1);
+        pas1.addNext(pas2);
 
-        Carriage actual = CarriageUtil.getHead(car3);
+        Carriage actual = CarriageUtil.getHead(pas2);
 
         assertEquals(expected, actual);
+
     }
 
     @Test
     void getTail() {
 
-        Locomotive car1 = (Locomotive) CarriageFactory.create(CarriageTypes.LOCOMOTIVE);
+        loc.addNext(pas1);
+        pas1.addNext(pas2);
 
-        PassengerCarriage car2 = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
-        PassengerCarriage expected = (PassengerCarriage) CarriageFactory.create(CarriageTypes.PASSENGER_CARRIAGE);
-        car1.addNext(car2);
-        car2.addNext(expected);
+        PassengerCarriage expected = pas2;
 
-        Carriage actual1 = CarriageUtil.getTail(car1);
-        Carriage actual2 = CarriageUtil.getTail(car2);
+        Carriage actual1 = CarriageUtil.getTail(loc);
+        Carriage actual2 = CarriageUtil.getTail(pas1);
 
         assertEquals(expected, actual1);
         assertEquals(expected, actual2);
@@ -66,8 +73,24 @@ class CarriageUtilTest {
 
     @Test
     void doTrain() {
-        assertEquals(false, true);
+
+        // expected
+        loc.addNext(pas1);
+        pas1.addNext(pas2);
+        List<Carriage> expected = new ArrayList<>(List.of(loc, pas1, pas2));
+        // actual
+        Locomotive acLoc = TestCarriage.locomotive();
+        PassengerCarriage acPas1 = TestCarriage.passengerCarriage();
+        PassengerCarriage acPas2 = TestCarriage.passengerCarriage();
+        CarriageUtil.doTrain(acLoc, acPas1, acPas2);
+        List<Carriage> actual = new ArrayList<>(List.of(acLoc, acPas1, acPas2));
+
+        assertEquals(expected, actual);
+
     }
 
+    private static void unBind(Carriage carriage) {
+
+    }
     // todo "snake tail" problem
 }

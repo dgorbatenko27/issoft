@@ -16,7 +16,7 @@ class CargoCarriageTest {
     void load() {
 
         Cargo cargo = aCargo(1);
-        CargoCarriage car1 = (CargoCarriage) CarriageFactory.create(CarriageTypes.CARGO_CARRIAGE);
+        CargoCarriage car1 = TestCarriage.cargoCarriage();
         car1.load(cargo);
 
         List<Cargo> expected = new ArrayList<>(List.of(cargo));
@@ -27,10 +27,10 @@ class CargoCarriageTest {
     }
 
     @Test
-    void loadToBigCargo() {
+    void loadTooBigCargo() {
 
         Cargo cargo = aCargo(65_000);
-        CargoCarriage car1 = (CargoCarriage) CarriageFactory.create(CarriageTypes.CARGO_CARRIAGE);
+        CargoCarriage car1 = TestCarriage.cargoCarriage();
 
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> car1.load(cargo));
@@ -47,7 +47,7 @@ class CargoCarriageTest {
 
         Cargo cargo1 = aCargo(10);
         Cargo cargo2 = aCargo(15);
-        CargoCarriage car1 = (CargoCarriage) CarriageFactory.create(CarriageTypes.CARGO_CARRIAGE);
+        CargoCarriage car1 = TestCarriage.cargoCarriage();
 
         car1.load(cargo1);
         car1.load(cargo2);
@@ -58,6 +58,20 @@ class CargoCarriageTest {
         List<Cargo> actual = car1.getCargos();
 
         assertThat(actual, equalToObject(expected));
+
+    }
+
+    @Test
+    void getTotalCargosWeight() {
+
+        Cargo cargo1 = aCargo(10);
+        Cargo cargo2 = aCargo(15);
+        CargoCarriage car = CargoCarriage.of(200);
+
+        car.load(cargo1);
+        car.load(cargo2);
+
+        assertEquals(10 + 15, car.getTotalCargosWeight());
 
     }
 
