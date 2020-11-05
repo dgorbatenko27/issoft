@@ -38,6 +38,24 @@ public abstract class Carriage {
         carriage.next = this;
     }
 
+    public void removePrevious() {
+        if (prev != null) {
+            prev.next = null;
+            prev = null;
+        }  else {
+            // do nothing
+        }
+    }
+
+    public void removeNext() {
+        if (next != null) {
+            next.prev = null;
+            next = null;
+        } else {
+            // do nothing
+        }
+    }
+
     public boolean isBinded() {
         return (prev == null && next == null);
     }

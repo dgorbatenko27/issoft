@@ -2,23 +2,23 @@ package entity.carriage;
 
 import entity.Cargo;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class CargoCarriage extends Carriage {
 
     @Getter
-    private int total;
-    @Getter
     private final int carryingCapacity;
-    private List<Cargo> cargos;
+    private final List<Cargo> cargos;
 
     private CargoCarriage(int carryingCapacity) {
         super();
         this.carryingCapacity = carryingCapacity;
         cargos = new ArrayList<>();
-        total = 0;
+        log.debug("CargoCarriage created: {}", this);
     }
 
     public List<Cargo> getCargos() {
@@ -26,9 +26,8 @@ public class CargoCarriage extends Carriage {
     }
 
     public void load(Cargo cargo) {
-        if (total + cargo.getWeight() <= carryingCapacity) {
+        if (canAddCargo(cargo)) {
             cargos.add(cargo);
-            total += cargo.getWeight();
         } else {
             throw new IllegalArgumentException("no place for cargo");
         }
@@ -36,11 +35,18 @@ public class CargoCarriage extends Carriage {
 
     public void unload(Cargo cargo) {
         cargos.remove(cargo);
-        total -= cargo.getWeight();
     }
 
     public static CargoCarriage of(int carryingCapacity) {
         return new CargoCarriage(carryingCapacity);
+    }
+
+    public int getTotalCargosWeight() {
+
+        return cargos.stream()
+                .map(Cargo::getWeight)
+                .reduce(0, Integer::sum);
+
     }
 
     @Override
@@ -48,8 +54,11 @@ public class CargoCarriage extends Carriage {
         final StringBuffer sb = new StringBuffer("CargoCarriage{");
         sb.append("id=").append(getId());
         sb.append(", carryingCapacity=").append(carryingCapacity);
-        sb.append(", total=").append(total);
         sb.append('}');
         return sb.toString();
+    }
+
+    private boolean canAddCargo(Cargo cargo) {
+        return getTotalCargosWeight() + cargo.getWeight() <= carryingCapacity;
     }
 }

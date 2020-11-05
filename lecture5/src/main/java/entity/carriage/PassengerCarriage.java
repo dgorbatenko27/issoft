@@ -2,10 +2,13 @@ package entity.carriage;
 
 import entity.roles.Passenger;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 public class PassengerCarriage extends Carriage {
 
 
@@ -13,35 +16,35 @@ public class PassengerCarriage extends Carriage {
 
     private PassengerCarriage(int capacity) {
         passengers = new Passengers(capacity);
+        log.debug("PassengerCarriage created: {}", this);
     }
 
     public class Passengers {
 
         @Getter
-        private int total;
-        @Getter
         private final Passenger[] passengers;
 
         private Passengers(int capacity) {
             passengers = new Passenger[capacity];
-            total = 0;
         }
 
         public void addPassenger(int seatId, Passenger passenger) {
+
             if (passengers[seatId] == null) {
                 passengers[seatId] = passenger;
-                total++;
             } else {
                 throw new IllegalArgumentException("seat is busy");
             }
+
         }
 
         public void addPassenger(Passenger passenger) {
 
-            if (total < 200) {
+            if (totalAmountOfPassengers() < passengers.length) {
                 for (int i = 0; i < passengers.length; i++) {
                     if (passengers[i] == null) {
                         passengers[i] = passenger;
+                        break;
                     }
                 }
             } else {
@@ -52,15 +55,13 @@ public class PassengerCarriage extends Carriage {
 
         public void removePassenger(int seatId) {
             passengers[seatId] = null;
-            total--;
         }
 
         public void removePassenger(Passenger passenger) {
 
             for (int i = 0; i < passengers.length; i++) {
-                if (passengers[i].equals(passenger)) {
+                if (passengers[i] != null && passengers[i].equals(passenger)) {
                     passengers[i] = null;
-                    total--;
                 }
             }
 
@@ -70,9 +71,16 @@ public class PassengerCarriage extends Carriage {
             return passengers.length;
         }
 
+        public int totalAmountOfPassengers() {
+            return (int) Arrays.stream(passengers)
+                    .filter(Objects::nonNull)
+                    .count();
+        }
+
     }
 
     public List<Passenger> getPassengers() {
+        // List.of() throws NPE
         return Arrays.asList(passengers.getPassengers());
     }
 
@@ -97,7 +105,7 @@ public class PassengerCarriage extends Carriage {
     }
 
     public int totalAmountOfPassengers() {
-        return passengers.getTotal();
+        return passengers.totalAmountOfPassengers();
     }
 
     public int getCapacity() {
