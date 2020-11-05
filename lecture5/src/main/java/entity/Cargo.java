@@ -8,13 +8,13 @@ public class Cargo {
     private final String info;
 
     @Getter
-    private int height;
+    private final int height;
     @Getter
-    private int width;
+    private final int width;
     @Getter
-    private int length;
+    private final int length;
     @Getter
-    private int weight;
+    private final int weight;
 
     private Cargo(String info, int height, int width, int length, int weight) {
         if (height > 0 && width > 0 && length > 0 && weight > 0) {
